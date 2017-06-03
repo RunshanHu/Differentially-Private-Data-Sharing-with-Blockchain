@@ -57,17 +57,22 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 
 //Query is entry point for queries
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-        fmt.Println("query is running" + function)
+        var key, jsonResp string
+        var err error
 
-        //Haddle different functions
-        if function == "read" {
-                return t.read(stub, args)
+        if len(args) != 1 {
+                return nil, errors.New("Incorrect number of arguments. Expecting name of the dataset to query")
         }
 
-        fmt.Println("query did not find func: " + function)
+        key = args[0]
+        valAsbytes, err := stub.GetState(key)
 
-        return nil, errors.New("Received unknown function query")
-        
+        if err != nil {
+                jsonResp = "{\"Error\": \"Failed to get the state for " + key + "\"}"
+                return nil, errors.New(jsonResp)
+        }
+
+        return valAsbytes, nil
 }
 
 //write - invoke function to write key/value pair
@@ -92,6 +97,7 @@ func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string)
         return nil, nil
 }
 
+/*
 func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
         var key, jsonResp string
         var err error
@@ -110,6 +116,6 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
         
         return valAsbytes, nil
 }
-
+*/
 
 
