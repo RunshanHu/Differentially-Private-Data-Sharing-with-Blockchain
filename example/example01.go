@@ -14,7 +14,6 @@ import (
 )
 
 type SimpleChaincode struct {
-
 }
 
 func main() {
@@ -34,7 +33,6 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
         if err != nil {
                 return nil, err
         }
-        
         return nil, nil
 }
 

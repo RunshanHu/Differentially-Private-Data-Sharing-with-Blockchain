@@ -1,0 +1,11 @@
+>>>Test: deploy the sharing history storing chaincode(initial state:['Data01', '0.5,[add,Joe],[delete,Mike]'])
+Successfully deploy chaincode with returned name = 89254934a88aab546cd90a24c25ace82c1014eb0bc16f9a9089f1ac5e1acd244eef39e07cf26e250beaf4c913708a60992517885bb99b88fb0c3c2af1c9623ad
+>>>Query 20 times, time used = 0.0375669002533
+>>>Query 200 times, time used = 0.367053985596
+>>>Query 2000 times, time used = 7.94499993324
+>>>Write to ledger with 2 tuples, time used = 0.00172400474548
+>>>Write to ledger with 4 tuples, time used = 0.00143623352051
+>>>Write to ledger with 8 tuples, time used = 0.00489902496338
+>>>Write to ledger with 8 tuples for 20 times, time used = 0.15571308136
+>>>Write to ledger with 8 tuples for 200 times, time used = 3.58451700211
+>>>Write to ledger with 8 tuples for 2000 times, time used = 62.7213730812
