@@ -1,11 +1,14 @@
 >>>Test: deploy the sharing history storing chaincode(initial state:['Data01', '0.5,[add,Joe],[delete,Mike]'])
-Successfully deploy chaincode with returned name = 89254934a88aab546cd90a24c25ace82c1014eb0bc16f9a9089f1ac5e1acd244eef39e07cf26e250beaf4c913708a60992517885bb99b88fb0c3c2af1c9623ad
->>>Query 20 times, time used = 0.0429780483246
->>>Query 200 times, time used = 0.370526075363
->>>Query 2000 times, time used = 16.2663369179
->>>Write to ledger with 2 tuples, time used = 0.00149297714233
->>>Write to ledger with 4 tuples, time used = 0.00146102905273
->>>Write to ledger with 8 tuples, time used = 0.00158596038818
->>>Write to ledger with 8 tuples for 20 times, time used = 0.165910959244
->>>Write to ledger with 8 tuples for 200 times, time used = 8.95841503143
->>>Write to ledger with 8 tuples for 2000 times, time used = 87.9196419716
+Successfully deploy chaincode with returned name = de10ce6176bb3a40e6e70ca1c10f88207479b7691bc7287cf3c8d219e4784405727bad9adfb3baa7928845b4c4357f954ad925ea78a17b12510e1f504df38c85
+>>>Query 20 times, time used = [0.04208707809448242, 0.04208803176879883, 0.04247307777404785]
+>>>Query 200 times, time used = [0.47488317489624023, 0.47895798683166504, 0.4799070167541504]
+>>>Query 2000 times, time used = [4.87494993209839, 5.273849964141846, 4.87893795967102]
+>>>Write to ledger with 2 tuples, time used = [0.0040279884338378906, 0.0045249252319335938, 0.0048839836120605469]
+>>>Write to ledger with 2 tuples for 20 times, time used = [0.07899406433105469, 0.07720400810241699, 0.07765509605407715]
+>>>Write to ledger with 4 tuples, time used = [0.0040987987518310547, 0.004034902572631836, 0.0042749176025390625]
+>>>Write to ledger with 4 tuples for 20 times, time used = [0.09575610160827637, 0.08600405693054199, 0.08879807472229004]
+>>>Write to ledger with 8 tuples, time used = [0.0044440240325927734, 0.004756906509399414, 0.004319812774658203]
+>>>Write to ledger with 8 tuples for 20 times, time used = [0.08511188507080078, 0.08512714385986328, 0.07998210334777832]
+>>>Write to ledger with 8 tuples for 20 times, time used = [0.08477713584899902, 0.085091142654418945, 0.0891370964050293]
+>>>Write to ledger with 8 tuples for 200 times, time used = [13.604562997817993, 12.249981164932251, 13.9284250736236572]
+>>>Write to ledger with 8 tuples for 2000 times, time used = [91.29008388519287, 87.99516415596008, 90.325134992599487]
