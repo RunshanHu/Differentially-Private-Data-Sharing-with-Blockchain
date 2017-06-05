@@ -9,6 +9,7 @@ import timeit
 
 API_URL = 'http://127.0.0.1:7050'
 DEPLOY_WAIT = 30
+TRAN_WAIT = 2
 CHAINCODE_PATH = "http://gopkg.in/RunshanHu/chaincode-example.v0/example"
 
 # query ledger state
@@ -101,6 +102,7 @@ if __name__ == '__main__':
     print(">>>Check the initial value (Data01): ")
     values = query(chaincode_name, ["Data01"], validate=True)
     print(values)
+    time.sleep(TRAN_WAIT)
 
     # query 20 times
     print(">>>Query 20 times, and calculate the time: ")
@@ -110,6 +112,7 @@ if __name__ == '__main__':
         setup = "from __main__ import query, chaincode_name")
     print("time used = {}".format(duration))
     f.write(">>>Query 20 times, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
 
     # query 200 time
     print(">>>Query 200 times, and calculate the time: ")
@@ -119,6 +122,7 @@ if __name__ == '__main__':
         setup = "from __main__ import query, chaincode_name")
     print("time used = {}".format(duration))
     f.write(">>>Query 200 times, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
 
     # query 2000 times
     print(">>>Query 2000 times, and calculate the time: ")
@@ -128,9 +132,10 @@ if __name__ == '__main__':
         setup = "from __main__ import query, chaincode_name")
     print("time used = {}".format(duration))
     f.write(">>>Query 2000 times, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
 
     # write different values (2 tuples)
-    print(">>>Write state to ledger with 2 tuples: ")
+    print(">>>Write state to ledger with 2 tuples (once): ")
     args = ["Data02", "0.6, [avg,age], [sum, salary]"]
     duration = timeit.timeit(
         "write(chaincode_name, args, validate = True)",
@@ -138,9 +143,21 @@ if __name__ == '__main__':
         setup = "from __main__ import write, chaincode_name, args")
     print("time used = {}".format(duration))
     f.write(">>>Write to ledger with 2 tuples, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
+
+    # write different values (2 tuples) for 20 times
+    print(">>>Write state to ledger with 2 tuples (20 times): ")
+    args = ["Data02", "0.6, [avg,age], [sum, salary]"]
+    duration = timeit.timeit(
+        "write(chaincode_name, args, validate = True)",
+        number = 20,
+        setup = "from __main__ import write, chaincode_name, args")
+    print("time used = {}".format(duration))
+    f.write(">>>Write to ledger with 2 tuples for 20 times, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
 
     # write different values (4 tuples)
-    print(">>>Write state to ledger with 4 tuples: ")
+    print(">>>Write state to ledger with 4 tuples (once): ")
     args = ["Data03", "0.6, [avg,age], [sum,salary], [add,name], [delete, address]"]
     duration = timeit.timeit(
         "write(chaincode_name, args, validate = True)",
@@ -148,9 +165,21 @@ if __name__ == '__main__':
         setup = "from __main__ import write, chaincode_name, args")
     print("time used = {}".format(duration))
     f.write(">>>Write to ledger with 4 tuples, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
+
+    # write different values (4 tuples) for 20 times
+    print(">>>Write state to ledger with 4 tuples (20 times): ")
+    args = ["Data03", "0.6, [avg,age], [sum,salary], [add,name], [delete, address]"]
+    duration = timeit.timeit(
+        "write(chaincode_name, args, validate = True)",
+        number = 20,
+        setup = "from __main__ import write, chaincode_name, args")
+    print("time used = {}".format(duration))
+    f.write(">>>Write to ledger with 4 tuples for 20 times, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
 
     # write different values (8 tuples)
-    print(">>>Write state to ledger with 8 tuples: ")
+    print(">>>Write state to ledger with 8 tuples (once): ")
     args = ["Data04", "0.6, [avg,age], [sum,salary], \
                             [add,name], [delete, address], \
                             [avg,salary], [query id], \
@@ -162,7 +191,22 @@ if __name__ == '__main__':
         setup = "from __main__ import write, chaincode_name, args")
     print("time used = {}".format(duration))
     f.write(">>>Write to ledger with 8 tuples, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
 
+    # write different values (8 tuples) for 20 times
+    print(">>>Write state to ledger with 8 tuples (20 times): ")
+    args = ["Data04", "0.6, [avg,age], [sum,salary], \
+                            [add,name], [delete, address], \
+                            [avg,salary], [query id], \
+                            [delete, age], [query, disease]"]
+
+    duration = timeit.timeit(
+        "write(chaincode_name, args, validate = True)",
+        number = 20,
+        setup = "from __main__ import write, chaincode_name, args")
+    print("time used = {}".format(duration))
+    f.write(">>>Write to ledger with 8 tuples for 20 times, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
     # write 20 times
     print(">>>Write to the ledger with 8 tuples for 20 time")
     tuples = "0.6, [avg,age], [sum,salary], \
@@ -176,6 +220,7 @@ if __name__ == '__main__':
         setup = "from __main__ import write, chaincode_name, tuples, dataids")
     print("time used = {}".format(duration))
     f.write(">>>Write to ledger with 8 tuples for 20 times, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
 
     # write 200 times
     print(">>>Write to the ledger with 8 tuples for 200 times")
@@ -190,6 +235,7 @@ if __name__ == '__main__':
         setup = "from __main__ import write, chaincode_name, tuples, dataids")
     print("time used = {}".format(duration))
     f.write(">>>Write to ledger with 8 tuples for 200 times, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
 
     # write 2000 times
     print(">>>Write to the ledger with 8 tuples for 2000 time")
@@ -204,6 +250,7 @@ if __name__ == '__main__':
         setup = "from __main__ import write, chaincode_name, tuples, dataids")
     print("time used = {}".format(duration))
     f.write(">>>Write to ledger with 8 tuples for 2000 times, time used = {}\n".format(duration))
+    time.sleep(TRAN_WAIT)
 
 
     # check if the value has been written correctly
