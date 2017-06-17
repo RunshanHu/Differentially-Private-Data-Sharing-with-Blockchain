@@ -46,6 +46,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
         if err != nil {
                 return nil, err
         }
+        getResultAnonyService(); 
         return nil, nil
 }
 
@@ -58,7 +59,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
                 return t.Init(stub, "init", args)
         } else if function == "write" {
                 return t.write(stub, args)
-        }
+        } 
 
         fmt.Println("invoke did not find func:" + function)
 
