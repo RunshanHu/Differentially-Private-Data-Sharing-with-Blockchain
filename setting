@@ -1,0 +1,21 @@
+1. install docker 
+
+curl -fsSL https://get.docker.com/ | sh
+sudo groupadd docker
+sudo gpasswd -a $USER docker
+newgrp docker
+
+/etc/default/docker
+DOCKER_OPTS="$DOCKER_OPTS -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --api-cors-header='*'"
+
+sudo service docker restart
+
+2. install docker-compose
+
+sudo aptitude install python-pip
+sudo pip install docker-compose
+
+3. download docker-compose files
+
+git clone https://github.com/yeasy/docker-compose-files
+
