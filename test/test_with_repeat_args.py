@@ -75,7 +75,7 @@ if __name__ == '__main__':
     c = Client(base_url=API_URL)
 
     # write to the file
-    f = open('test_4peers.dat', 'w')
+    f = open('test_original.dat', 'w')
 
     print("Checking cluster at {}".format(API_URL))
 
