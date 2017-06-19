@@ -190,14 +190,14 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        return []byte(str), nil 
 }
 
-func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType string, newResult float64, subBudget float64) ([]byte, error) {
+func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType string, newResult float64, subBudget float64) (error) {
 
         logger.Info("--->updateLedger called")
 
         valAsbytes, err := stub.GetState(dataId)
         if err != nil {
           jsonResp := "{\"Error\": \"Failed to get the state for " + dataId + "\"}"
-                 return nil, errors.New(jsonResp) 
+                 return errors.New(jsonResp) 
         }
         
         newValue := ledgerMes{} 
@@ -215,14 +215,14 @@ func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType strin
         newValue_json,err := json.Marshal(newValue)
         
         // write back to the ledger
-        err = stub.PutState(dataId, []byte(newValue_json))
+        err := stub.PutState(dataId, []byte(newValue_json))
         if err != nil {
-               return nil, err 
+               return err 
         }
 
         logger.Info("--->updating ledger, newBudget: ", newValue.RemainBudget, ", FunctionType: ", funType, ", newVale: ", newResult)
 
-        return nil, nil
+        return nil
 }
 
 type serviceResult struct {
