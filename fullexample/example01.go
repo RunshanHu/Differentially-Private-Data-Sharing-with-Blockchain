@@ -8,7 +8,6 @@ package main
 
 import (
         "errors"
-        "bytes"
         "fmt"
         "math"
         "log"
