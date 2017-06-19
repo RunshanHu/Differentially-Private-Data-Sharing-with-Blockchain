@@ -215,7 +215,7 @@ func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType strin
         newValue_json,err := json.Marshal(newValue)
         
         // write back to the ledger
-        err := stub.PutState(dataId, []byte(newValue_json))
+        err = stub.PutState(dataId, []byte(newValue_json))
         if err != nil {
                return err 
         }
