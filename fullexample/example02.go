@@ -13,7 +13,6 @@ import (
         "log"
         "encoding/json"
         "net/http"
-        "time"
         "io/ioutil"
         "github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -51,7 +50,6 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
         if err != nil {
                 return nil, err
         }
-        getResultAnonyService(); 
         return nil, nil
 }
 
@@ -80,12 +78,14 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        var value string
        var err error
 
+       utility_bound := 0.1
+
        // args should have two parameter: datasetId and user's query
        if len(args) != 2 {
                return nil, errors.New("Incorrect number of arguments. Expecting 2. DatasetID and your query ")
        }
        
-       dataID = args[0];
+       dataId = args[0];
        value = args[1];
        
        //parser user's query 
@@ -93,9 +93,9 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        json.Unmarshal([]byte(value), &mes_from_query);
 
        // get the old query from ledger
-       valAsbytes, err := stub.GetState(dataID);
+       valAsbytes, err := stub.GetState(dataId);
        if err != nil {
-                jsonResp = "{\"Error\": \"Failed to get the state for " + dataID + "\"}"
+                jsonResp := "{\"Error\": \"Failed to get the state for " + dataId + "\"}"
                 return nil, errors.New(jsonResp) 
        }
 
@@ -131,7 +131,7 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                         // updateLedger()
                         updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
                       } else {
-                        final_result = nil
+                        final_result = -1000 
                         // updateLedger()
                         updateLedger(stub, dataId, mes_from_query.FunType, final_result, smallbudget)
                       }
@@ -142,18 +142,19 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                                //updateLedger()
                                updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
                        } else {
-                               final_result = nil
+                               final_result = -1000 
                                // updateLedger()
                                updateLedger(stub, dataId, mes_from_query.FunType, final_result, 0)
                       }
        }
+       return nil, nil
 }
 
-func (t *SimpleChaincode) updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType string, newResult float64, subBudget float64) ([]byte, error) {
+func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType string, newResult float64, subBudget float64) ([]byte, error) {
 
         valAsbytes, err := stub.GetState(dataId)
         if err != nil {
-                 jsonResp = "{\"Error\": \"Failed to get the state for " + dataId + "\"}"
+          jsonResp := "{\"Error\": \"Failed to get the state for " + dataId + "\"}"
                  return nil, errors.New(jsonResp) 
         }
         
@@ -169,9 +170,10 @@ func (t *SimpleChaincode) updateLedger(stub shim.ChaincodeStubInterface, dataId 
                 }
         }
         newValue.Result[index] = newResult
+        newValue_json,err := json.Marshal(newValue)
         
         // write back to the ledger
-        err = stub.PutState(dataId, []byte(newValue))
+        err = stub.PutState(dataId, []byte(newValue_json))
         if err != nil {
                return nil, err 
         }
@@ -182,43 +184,43 @@ type serviceResult struct {
          Result float64 `json:"result"`
 }
 
-func getResultAnonyService( funtype string, budget float64  ) final_result float64  {
-  
-        var resp, err
+func getResultAnonyService( funtype string, budget float64  ) float64  {
+ 
+        resp, err := http.Get("http://10.7.6.25:3000/dataset/sum")
         switch funtype {
                case "sum": 
-                         resp, err := http.Get("http://10.7.6.25:3000/dataset/sum")
+                         resp, err = http.Get("http://10.7.6.25:3000/dataset/sum")
                case "avg": 
-                         resp, err := http.Get("http://10.7.6.25:3000/dataset/avg")
+                         resp, err = http.Get("http://10.7.6.25:3000/dataset/avg")
                case "max": 
-                         resp, err := http.Get("http://10.7.6.25:3000/dataset/max")
+                         resp, err = http.Get("http://10.7.6.25:3000/dataset/max")
                case "min": 
-                         resp, err := http.Get("http://10.7.6.25:3000/dataset/min")
-               default:
+                         resp, err = http.Get("http://10.7.6.25:3000/dataset/min")
+        /*       default:
                        {
                          log.Println("unrecognized function type")
                          return nil
                        }
+       */
         } 
         if err != nil {
                 log.Println(err);
         }
 
-        var body
-        body,err = ioutil.ReadAll(resp.Body);
+        body,err := ioutil.ReadAll(resp.Body);
         if err != nil {
                 log.Println(err);
         }
 
         defer resp.Body.Close();
 
-        result := make([]serviceResult, 0);
+        result := serviceResult{}
 
-        if err = json.Unmarshal(body, &result); err != nil {
+        if err := json.Unmarshal(body, &result); err != nil {
                 log.Println(err); 
         }
 
-        final_result = result.Result;
+        return result.Result;
 }
 
 //write - invoke function to write key/value pair
