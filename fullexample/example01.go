@@ -99,7 +99,7 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        mes_from_query := queryMes{}
        json.Unmarshal([]byte(value), &mes_from_query);
 
-       logger.Info("--->parser user's query")
+       logger.Info("--->parser user's query: ", mes_from_query)
 
        // get the old query from ledger
        valAsbytes, err := stub.GetState(dataId);
@@ -111,6 +111,8 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        // parser the old query (from ledger)
        mes_from_ledger := ledgerMes{}
        json.Unmarshal(valAsbytes, &mes_from_ledger)
+       
+       logger.Info("--->got the state from the ledger: ", mes_from_ledger)
 
        flag := false;   //whether query exists before
        var old_result, final_result, perturbed_result float64
@@ -126,36 +128,46 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        // if old result exist
        if flag {
                 // old result (from ledger)
+                logger.Info("--->Old result exist on the ledger")
                 old_result = mes_from_ledger.Result[i]
                 // get perturbed result from anonymisation service
                 perturbed_result = getResultAnonyService(mes_from_query.FunType, smallbudget)
                 // utility test
-                logger.Info("--->got the perturbed result from anonymisation service: ", perturbed_result)
+                logger.Info("--->got the perturbed result from anonymisation service(using small budget): ", perturbed_result)
                 if math.Abs(old_result - perturbed_result) < utility_bound {
+
+                        logger.Info("--->perturbed result pass the utility test! Use this result for user's query!")
+                        
                         final_result =  perturbed_result
                         updateLedger(stub, dataId, mes_from_query.FunType, final_result, smallbudget)
                         
                 } else {
-                       if mes_from_ledger.RemainBudget >= mes_from_query.RequestBudget  {
-                        final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget)
-                        // updateLedger()
-                        updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
-                      } else {
-                        final_result = -1000 
-                        // updateLedger()
-                        updateLedger(stub, dataId, mes_from_query.FunType, final_result, smallbudget)
-                      }
+                        logger.Info("--->perturbed result not pass the utility test! check if satify budget verification")
+                        if mes_from_ledger.RemainBudget >= mes_from_query.RequestBudget  {
+                              logger.Info("--->Pass the budget verification! Getting the new result from anonymisation service(using requested budget): ")
+                              final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget)
+                              // updateLedger()
+                              updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
+                        } else {
+                              logger.Info("--->Do not pass the budget verification! Not return any result for the user! (-1000)")
+                              final_result = -1000 
+                              // updateLedger()
+                              logger.Info("--->Still updating ledger using small budget and perturbed result..")
+                              updateLedger(stub, dataId, mes_from_query.FunType, perturbed_result, smallbudget)
+                        }
                 }
        } else { // old result not exist
-                       if mes_from_ledger.RemainBudget >= mes_from_query.RequestBudget  {
-                               final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget)
-                               //updateLedger()
-                               updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
-                       } else {
-                               final_result = -1000 
-                               // updateLedger()
-                               updateLedger(stub, dataId, mes_from_query.FunType, final_result, 0)
-                      }
+                logger.Info("--->Old result not exist! Check if satify budget verification")
+                if mes_from_ledger.RemainBudget >= mes_from_query.RequestBudget  {
+                        logger.Info("--->Pass the budget verification! Getting the new result from anonymisation service(using requested, budget): ")
+                        final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget)
+                        //updateLedger()
+                        updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
+                } else {
+                        logger.Info("--->Do not pass the budget verification! Not return any result for the user! (-1000)")
+                        final_result = -1000 
+                        logger.Info("--->No update of the ledger")
+                }
        }
        return nil, nil
 }
@@ -190,7 +202,7 @@ func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType strin
                return nil, err 
         }
 
-        logger.Info("--->updating ledger, funType: ", funType, "newBudget: ", newValue.RemainBudget, "newVale: ", newResult)
+        logger.Info("--->updating ledger, newBudget: ", newValue.RemainBudget, ", FunctionType: ", funType, ", newVale: ", newResult)
 
         return nil, nil
 }
@@ -236,6 +248,8 @@ func getResultAnonyService( funtype string, budget float64  ) float64  {
         if err := json.Unmarshal(body, &result); err != nil {
                 log.Println(err); 
         }
+
+        logger.Info("--->got the result from anonymisation service: ", funType, " : ", result.Result)
 
         return result.Result;
 }
