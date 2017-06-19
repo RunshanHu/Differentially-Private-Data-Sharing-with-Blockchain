@@ -5,13 +5,13 @@ from hyperledger.client import Client
 
 import sys
 import time
-import timeit
 
 API_URL = 'http://127.0.0.1:7050'
 DEPLOY_WAIT = 30
 TRAN_WAIT = 2
 REPEAT_TIME = 5
 CHAINCODE_PATH = "http://gopkg.in/RunshanHu/chaincode-example.v0/fullexample"
+
 
 # query ledger state
 def query(chaincode_name, arg_List, validate=False):
@@ -39,6 +39,25 @@ def query(chaincode_name, arg_List, validate=False):
 
     if validate:
         return result
+
+
+# query match test
+def query_match_test(chaincode_name, arg_List, validate=False):
+
+    result, resp = [], {}
+
+    resp = c.chaincode_invoke(chaincode_name=chaincode_name,
+                                 function="queryMatchTest",
+                                 args=arg_List)
+
+    if resp['result']['status'] == 'OK':
+        result.append(resp['result']['message'])
+    else:
+        print("Error when query match testing")
+
+    if validate:
+        return result
+
 
 def write(chaincode_name, arg_List, validate=False):
     #write to the ledger with different args
@@ -104,5 +123,13 @@ if __name__ == '__main__':
     print(">>>Check the initial value (Data01): ")
     values = query(chaincode_name, ["Data01"], validate=True)
     print(values)
+
+    # check query_match_test
+    print(">>>Query match test")
+    payload = '''{"budget":0.1, "funType":"sum"}'''
+    values = query_match_test(chaincode_name, ["Data01", payload], validate=True)
+    print(values)
+
+
 
     f.close()
