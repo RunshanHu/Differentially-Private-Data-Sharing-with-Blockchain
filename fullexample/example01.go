@@ -119,7 +119,7 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                 // old result (from ledger)
                 old_result = mes_from_ledger.Result[i]
                 // get perturbed result from anonymisation service
-                perturbed_result := getResultAnonyService(mes_from_query.FunType, smallbudget)
+                perturbed_result = getResultAnonyService(mes_from_query.FunType, smallbudget)
                 // utility test
                 if math.Abs(old_result - perturbed_result) < utility_bound {
                         final_result =  perturbed_result
