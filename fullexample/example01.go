@@ -139,7 +139,6 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                 perturbed_result = getResultAnonyService(mes_from_query.FunType, smallbudget)
                 // utility test
                 
-                str = fmt.Sprintf(
                 logger.Info("--->got the perturbed result from anonymisation service(using small budget): ", perturbed_result)
 
                 if math.Abs(old_result - perturbed_result) < utility_bound {
