@@ -11,7 +11,7 @@ API_URL = 'http://127.0.0.1:7050'
 DEPLOY_WAIT = 30
 TRAN_WAIT = 2
 REPEAT_TIME = 5
-CHAINCODE_PATH = "http://gopkg.in/RunshanHu/chaincode-example.v0/example"
+CHAINCODE_PATH = "http://gopkg.in/RunshanHu/chaincode-example.v0/fullexample"
 
 # query ledger state
 def query(chaincode_name, arg_List, validate=False):
