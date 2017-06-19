@@ -66,6 +66,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
         } else if function == "write" {
                 return t.write(stub, args)
         } else if function == "queryMatchTest" {
+                logger.Info("--->queryMatchTest invoked")
                 return t.queryMatchTest(stub, args)
         }
 
@@ -77,6 +78,9 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 
 
 func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+       
+       logger.Info("--->queryMatchTest called")
+
        var dataId string
        var value string
        var err error
@@ -94,6 +98,8 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        //parser user's query 
        mes_from_query := queryMes{}
        json.Unmarshal([]byte(value), &mes_from_query);
+
+       logger.Info("--->parser user's query")
 
        // get the old query from ledger
        valAsbytes, err := stub.GetState(dataId);
@@ -155,6 +161,8 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
 
 func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType string, newResult float64, subBudget float64) ([]byte, error) {
 
+        logger.Info("--->updateLedger called")
+
         valAsbytes, err := stub.GetState(dataId)
         if err != nil {
           jsonResp := "{\"Error\": \"Failed to get the state for " + dataId + "\"}"
@@ -188,6 +196,8 @@ type serviceResult struct {
 }
 
 func getResultAnonyService( funtype string, budget float64  ) float64  {
+
+        logger.info("--->getResultAnonyService called")
  
         resp, err := http.Get("http://10.7.6.25:3000/dataset/sum")
         switch funtype {
