@@ -33,7 +33,7 @@ type queryMes struct {
   FunType          string    `json:"funType"`
 }
 
-var logger = shim.Newlogger("chaincode_sharing_history")
+var logger = shim.NewLogger("chaincode_sharing_history")
 
 func main() {
         logger.Info("--->main called")
