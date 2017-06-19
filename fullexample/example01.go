@@ -8,6 +8,7 @@ package main
 
 import (
         "errors"
+        "bytes"
         "fmt"
         "math"
         "log"
@@ -79,7 +80,10 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 
 func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
        
-       logger.Info("--->queryMatchTest called")
+       var resp []byte 
+       var str  string
+
+       logger.Info("--->queryMatchTest called!")
 
        var dataId string
        var value string
@@ -128,18 +132,25 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        // if old result exist
        if flag {
                 // old result (from ledger)
-                logger.Info("--->Old result exist on the ledger")
+                logger.Info("--->old result exists on the ledger")
+
                 old_result = mes_from_ledger.Result[i]
                 // get perturbed result from anonymisation service
                 perturbed_result = getResultAnonyService(mes_from_query.FunType, smallbudget)
                 // utility test
+                
+                str = fmt.Sprintf(
                 logger.Info("--->got the perturbed result from anonymisation service(using small budget): ", perturbed_result)
+
                 if math.Abs(old_result - perturbed_result) < utility_bound {
 
                         logger.Info("--->perturbed result pass the utility test! Use this result for user's query!")
                         
                         final_result =  perturbed_result
                         updateLedger(stub, dataId, mes_from_query.FunType, final_result, smallbudget)
+
+                        str = fmt.Sprintf("--->old result exists and perturbed result pass the utility test! result: %f", final_result)
+                        resp = append(resp, []byte(str))
                         
                 } else {
                         logger.Info("--->perturbed result not pass the utility test! check if satify budget verification")
@@ -148,12 +159,19 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                               final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget)
                               // updateLedger()
                               updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
+
+                              str = fmt.Sprintf("--->old result exists but perturbed result not pass the utility test, budget satify! result: %f", final_result)
+                              resp = append(resp, []byte(str))
+                              
                         } else {
                               logger.Info("--->Do not pass the budget verification! Not return any result for the user! (-1000)")
                               final_result = -1000 
                               // updateLedger()
                               logger.Info("--->Still updating ledger using small budget and perturbed result..")
                               updateLedger(stub, dataId, mes_from_query.FunType, perturbed_result, smallbudget)
+
+                              str = fmt.Sprintf("--->old result exists, perturbed result not  pass the utility test, budget not enough, no result!")
+                              resp = append(resp, []byte(str))
                         }
                 }
        } else { // old result not exist
@@ -163,13 +181,21 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                         final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget)
                         //updateLedger()
                         updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
+
+                        str = fmt.Sprintf("--->old result not exist, budget satify, result: %f", final_result)
+                        resp = append(resp, []byte(str))
+
                 } else {
                         logger.Info("--->Do not pass the budget verification! Not return any result for the user! (-1000)")
                         final_result = -1000 
                         logger.Info("--->No update of the ledger")
+
+                        str = fmt.Sprintf("--->old result not exist, budget not enough, no result!")
+                        resp = append(resp, []byte(str))
+
                 }
        }
-       return nil, nil
+       return resp, nil 
 }
 
 func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType string, newResult float64, subBudget float64) ([]byte, error) {
