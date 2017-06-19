@@ -33,7 +33,10 @@ type queryMes struct {
   FunType          string    `json:"funType"`
 }
 
+var logger = shim.Newlogger("chaincode_sharing_history")
+
 func main() {
+        logger.Info("--->main called")
         err := shim.Start(new(SimpleChaincode))
         if err != nil {
                 fmt.Printf("Error starting sharing historty storage chaincode: %s", err)
