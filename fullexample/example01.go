@@ -249,7 +249,7 @@ func getResultAnonyService( funtype string, budget float64  ) float64  {
                 log.Println(err); 
         }
 
-        logger.Info("--->got the result from anonymisation service: ", funType, " : ", result.Result)
+        logger.Info("--->got the result from anonymisation service: ", funtype, " : ", result.Result)
 
         return result.Result;
 }
