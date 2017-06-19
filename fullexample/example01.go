@@ -80,7 +80,6 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 
 func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
        
-       var resp []byte 
        var str  string
 
        logger.Info("--->queryMatchTest called!")
@@ -149,7 +148,6 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                         updateLedger(stub, dataId, mes_from_query.FunType, final_result, smallbudget)
 
                         str = fmt.Sprintf("--->old result exists and perturbed result pass the utility test! result: %f", final_result)
-                        resp = append(resp, []byte(str))
                         
                 } else {
                         logger.Info("--->perturbed result not pass the utility test! check if satify budget verification")
@@ -160,7 +158,6 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                               updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
 
                               str = fmt.Sprintf("--->old result exists but perturbed result not pass the utility test, budget satify! result: %f", final_result)
-                              resp = append(resp, []byte(str))
                               
                         } else {
                               logger.Info("--->Do not pass the budget verification! Not return any result for the user! (-1000)")
@@ -170,7 +167,6 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                               updateLedger(stub, dataId, mes_from_query.FunType, perturbed_result, smallbudget)
 
                               str = fmt.Sprintf("--->old result exists, perturbed result not  pass the utility test, budget not enough, no result!")
-                              resp = append(resp, []byte(str))
                         }
                 }
        } else { // old result not exist
@@ -182,7 +178,6 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                         updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
 
                         str = fmt.Sprintf("--->old result not exist, budget satify, result: %f", final_result)
-                        resp = append(resp, []byte(str))
 
                 } else {
                         logger.Info("--->Do not pass the budget verification! Not return any result for the user! (-1000)")
@@ -190,11 +185,10 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                         logger.Info("--->No update of the ledger")
 
                         str = fmt.Sprintf("--->old result not exist, budget not enough, no result!")
-                        resp = append(resp, []byte(str))
 
                 }
        }
-       return resp, nil 
+       return []byte(str), nil 
 }
 
 func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType string, newResult float64, subBudget float64) ([]byte, error) {
