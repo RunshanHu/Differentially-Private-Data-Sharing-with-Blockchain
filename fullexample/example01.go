@@ -187,7 +187,7 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
 
                 }
        }
-       return []byte("Hello"), nil 
+       return []byte(str), nil 
 }
 
 func updateLedger(stub shim.ChaincodeStubInterface, dataId string, funType string, newResult float64, subBudget float64) ([]byte, error) {
