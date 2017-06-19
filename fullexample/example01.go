@@ -197,7 +197,7 @@ type serviceResult struct {
 
 func getResultAnonyService( funtype string, budget float64  ) float64  {
 
-        logger.info("--->getResultAnonyService called")
+        logger.Info("--->getResultAnonyService called")
  
         resp, err := http.Get("http://10.7.6.25:3000/dataset/sum")
         switch funtype {
