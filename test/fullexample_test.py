@@ -51,7 +51,7 @@ def query_match_test(chaincode_name, arg_List, validate=False):
                                  args=arg_List)
 
     if resp['result']['status'] == 'OK':
-        result.append(resp['result']['message'])
+        result.append(resp)
     else:
         print("Error when query match testing")
 
@@ -78,7 +78,7 @@ def write(chaincode_name, arg_List, validate=False):
 
 # Main  Usage:
 # * python test.py [API_URL=http://127.0.0.1:7050] will deploy first
-# * python test.py [API_URL=http://127.0.0.1:7050] [chaincode_name]
+# * python test.py [chaincode_name] [API_URL=http://127.0.0.1:7050]
 if __name__ == '__main__':
     if len(sys.argv) not in [1, 2, 3]:
         print("Usage: python test.py ["
@@ -87,9 +87,9 @@ if __name__ == '__main__':
     # parse the parameters from command line
     chaincode_name = ""
     if len(sys.argv) >= 2:
-        API_URL = sys.argv[1]
+        chaincode_name = sys.argv[1]
     if len(sys.argv) >= 3:
-        chaincode_name = sys.argv[2]
+        API_URL = sys.argv[2]
 
     c = Client(base_url=API_URL)
 
@@ -125,11 +125,14 @@ if __name__ == '__main__':
     print(values)
 
     # check query_match_test
-    print(">>>Query match test")
     payload = '''{"budget":0.1, "funType":"sum"}'''
+    print(">>>Query test with payload: {}..".format(payload))
     values = query_match_test(chaincode_name, ["Data01", payload], validate=True)
     print(values)
 
-
+    # check the result after query match test
+    print(">>>Check the result: ")
+    values = query(chaincode_name, ["Data01"], validate=True)
+    print(values)
 
     f.close()
