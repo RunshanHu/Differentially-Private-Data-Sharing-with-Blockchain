@@ -14,6 +14,7 @@ import (
         "encoding/json"
         "net/http"
         "io/ioutil"
+        "strings"
         "github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
@@ -232,23 +233,24 @@ type serviceResult struct {
 func getResultAnonyService( funtype string, budget float64  ) float64  {
 
         logger.Info("--->getResultAnonyService called")
- 
         resp, err := http.Get("http://10.7.6.25:3000/dataset/sum")
+        flag := true;
+        
+        reader_str := fmt.Sprintf("budget=%f", budget);
+        
         switch funtype {
                case "sum": 
-                         resp, err = http.Get("http://10.7.6.25:3000/dataset/sum")
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "avg": 
                          resp, err = http.Get("http://10.7.6.25:3000/dataset/avg")
                case "max": 
                          resp, err = http.Get("http://10.7.6.25:3000/dataset/max")
                case "min": 
                          resp, err = http.Get("http://10.7.6.25:3000/dataset/min")
-        /*       default:
-                       {
+               default:{
                          log.Println("unrecognized function type")
-                         return nil
+                         flag = false; 
                        }
-       */
         } 
         if err != nil {
                 log.Println(err);
