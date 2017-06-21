@@ -237,16 +237,17 @@ func getResultAnonyService( funtype string, budget float64  ) float64  {
         normalResp := true;
         
         reader_str := fmt.Sprintf("budget=%f", budget);
-        
+        var resp *Response
+        var err error
         switch funtype {
                case "sum": 
-                         resp, err := http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "avg": 
-                         resp, err := http.Post("http://10.7.6.25:3000/dataset/avg", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/avg", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "max": 
-                         resp, err := http.Post("http://10.7.6.25:3000/dataset/max", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/max", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "min": 
-                         resp, err := http.Post("http://10.7.6.25:3000/dataset/min", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/min", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                default:{
                          log.Println("unrecognized function type")
                          normalResp = false; 
