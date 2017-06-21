@@ -237,7 +237,7 @@ func getResultAnonyService( funtype string, budget float64  ) float64  {
         normalResp := true;
         
         reader_str := fmt.Sprintf("budget=%f", budget);
-        var resp *Response
+        var resp *http.Response
         var err error
         switch funtype {
                case "sum": 
