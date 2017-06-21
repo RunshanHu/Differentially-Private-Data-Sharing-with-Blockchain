@@ -234,7 +234,7 @@ func getResultAnonyService( funtype string, budget float64  ) float64  {
 
         logger.Info("--->getResultAnonyService called")
         resp, err := http.Get("http://10.7.6.25:3000/dataset/sum")
-        flag := true;
+        normalResp := true;
         
         reader_str := fmt.Sprintf("budget=%f", budget);
         
@@ -249,29 +249,36 @@ func getResultAnonyService( funtype string, budget float64  ) float64  {
                          resp, err = http.Get("http://10.7.6.25:3000/dataset/min")
                default:{
                          log.Println("unrecognized function type")
-                         flag = false; 
+                         normalResp = false; 
                        }
         } 
         if err != nil {
                 log.Println(err);
+                normalResp = false;
         }
 
-        body,err := ioutil.ReadAll(resp.Body);
-        if err != nil {
-                log.Println(err);
+        if normalResp {
+               
+               body,err := ioutil.ReadAll(resp.Body);
+               if err != nil {
+                         log.Println(err);
+               }
+
+               defer resp.Body.Close();
+
+               result := serviceResult{}
+
+               if err := json.Unmarshal(body, &result); err != nil {
+                         log.Println(err); 
+               }
+
+               logger.Info("--->got the result from anonymisation service: ", funtype, " : ", result.Result)
+
+               return result.Result;
+        } else {
+               
+               return -1000;
         }
-
-        defer resp.Body.Close();
-
-        result := serviceResult{}
-
-        if err := json.Unmarshal(body, &result); err != nil {
-                log.Println(err); 
-        }
-
-        logger.Info("--->got the result from anonymisation service: ", funtype, " : ", result.Result)
-
-        return result.Result;
 }
 
 //write - invoke function to write key/value pair
