@@ -18,6 +18,9 @@ import (
         "github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
+const SMALL_BUDGET = 0.5
+const UTILITY_BOUND = 5
+
 type SimpleChaincode struct {
 }
 
@@ -88,11 +91,9 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        var value string
        var err error
 
-       utility_bound := 0.1
-
        // args should have two parameter: datasetId and user's query
        if len(args) != 2 {
-               return nil, errors.New("Incorrect number of arguments. Expecting 2. DatasetID and your query ")
+               return nil, errors.New("Incorrect number of arguments. Expecting 2. DatasetId and your query ")
        }
        
        dataId = args[0];
@@ -121,11 +122,13 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        var old_result, final_result, perturbed_result float64
        var i int
        var e string
-       smallbudget := 0.1;
+       SMALL_BUDGET := 0.1;
        for i, e = range mes_from_ledger.FunType {
                 if e == mes_from_query.FunType {
-                        flag = true 
-                        break 
+                        if mes_from_ledger.Result[i] > 0 {
+                                flag = true 
+                                break 
+                        }
                 } 
        }
        // if old result exist
@@ -135,17 +138,17 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
 
                 old_result = mes_from_ledger.Result[i]
                 // get perturbed result from anonymisation service
-                perturbed_result = getResultAnonyService(mes_from_query.FunType, smallbudget)
+                perturbed_result = getResultAnonyService(mes_from_query.FunType, SMALL_BUDGET)
                 // utility test
                 
                 logger.Info("--->got the perturbed result from anonymisation service(using small budget): ", perturbed_result)
 
-                if math.Abs(old_result - perturbed_result) < utility_bound {
+                if math.Abs(old_result - perturbed_result) < UTILITY_BOUND {
 
                         logger.Info("--->perturbed result pass the utility test! Use this result for user's query!")
                         
                         final_result =  perturbed_result
-                        updateLedger(stub, dataId, mes_from_query.FunType, final_result, smallbudget)
+                        updateLedger(stub, dataId, mes_from_query.FunType, final_result, SMALL_BUDGET)
 
                         str = fmt.Sprintf("--->old result exists and perturbed result pass the utility test! result: %f", final_result)
                         
@@ -164,7 +167,7 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                               final_result = -1000 
                               // updateLedger()
                               logger.Info("--->Still updating ledger using small budget and perturbed result..")
-                              updateLedger(stub, dataId, mes_from_query.FunType, perturbed_result, smallbudget)
+                              updateLedger(stub, dataId, mes_from_query.FunType, perturbed_result, SMALL_BUDGET)
 
                               str = fmt.Sprintf("--->old result exists, perturbed result not  pass the utility test, budget not enough, no result!")
                         }
@@ -233,7 +236,6 @@ type serviceResult struct {
 func getResultAnonyService( funtype string, budget float64  ) float64  {
 
         logger.Info("--->getResultAnonyService called")
-        resp, err := http.Get("http://10.7.6.25:3000/dataset/sum")
         normalResp := true;
         
         reader_str := fmt.Sprintf("budget=%f", budget);
@@ -242,11 +244,11 @@ func getResultAnonyService( funtype string, budget float64  ) float64  {
                case "sum": 
                          resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "avg": 
-                         resp, err = http.Get("http://10.7.6.25:3000/dataset/avg")
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/avg", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "max": 
-                         resp, err = http.Get("http://10.7.6.25:3000/dataset/max")
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/max", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "min": 
-                         resp, err = http.Get("http://10.7.6.25:3000/dataset/min")
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/min", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                default:{
                          log.Println("unrecognized function type")
                          normalResp = false; 
@@ -280,8 +282,27 @@ func getResultAnonyService( funtype string, budget float64  ) float64  {
                return -1000;
         }
 }
+//Query is entry point for queries
+func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
+        var key, jsonResp string
+        var err error
 
-//write - invoke function to write key/value pair
+        if len(args) != 1 {
+                return nil, errors.New("Incorrect number of arguments. Expecting name of the dataId to query")
+        }
+
+        key = args[0]
+        valAsbytes, err := stub.GetState(key)
+
+        if err != nil {
+                jsonResp = "{\"Error\": \"Failed to get the state for " + key + "\"}"
+                return nil, errors.New(jsonResp)
+        }
+
+        return valAsbytes, nil
+}
+
+/* Test only: write - invoke function to write key/value pair
 func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
         var datasetId, value string
         var err error
@@ -302,46 +323,4 @@ func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string)
 
         return nil, nil
 }
-
-//Query is entry point for queries
-func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-        var key, jsonResp string
-        var err error
-
-        if len(args) != 1 {
-                return nil, errors.New("Incorrect number of arguments. Expecting name of the dataset to query")
-        }
-
-        key = args[0]
-        valAsbytes, err := stub.GetState(key)
-
-        if err != nil {
-                jsonResp = "{\"Error\": \"Failed to get the state for " + key + "\"}"
-                return nil, errors.New(jsonResp)
-        }
-
-        return valAsbytes, nil
-}
-
-/*
-func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-        var key, jsonResp string
-        var err error
-
-        if len(args) !=1 {
-                return nil, errors.New("Incorrect number of arguments. Expecting name of the key to query")
-        }
-
-        key = args[0]
-        valAsbytes, err := stub.GetState(key)
-
-        if err != nil {
-                jsonResp = "{\"Error\":\"Failed to get state for " + key + "\"}"
-                return nil, errors.New(jsonResp)
-        }
-        
-        return valAsbytes, nil
-}
 */
-
-
