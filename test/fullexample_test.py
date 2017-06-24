@@ -7,9 +7,8 @@ import sys
 import time
 
 API_URL = 'http://127.0.0.1:7050'
-DEPLOY_WAIT = 30
-TRAN_WAIT = 2
-REPEAT_TIME = 5
+DEPLOY_WAIT = 20
+TRAN_WAIT = 5
 CHAINCODE_PATH = "http://gopkg.in/RunshanHu/chaincode-example.v0/fullexample"
 
 
@@ -51,7 +50,7 @@ def query_match_test(chaincode_name, arg_List, validate=False):
                                  args=arg_List)
 
     if resp['result']['status'] == 'OK':
-        result.append(resp)
+        result.append(resp['result']['message'])
     else:
         print("Error when query match testing")
 
@@ -75,6 +74,7 @@ def write(chaincode_name, arg_List, validate=False):
 
     if validate:
         return result
+
 
 # Main  Usage:
 # * python test.py [API_URL=http://127.0.0.1:7050] will deploy first
@@ -100,7 +100,8 @@ if __name__ == '__main__':
 
     # deploy the chaincode
     if not chaincode_name:
-        payload = '''{"budget":0.5,"funType":["sum","avg","max","min"],"results":[100,10,101,10]}'''
+        payload = '''{"budget":0.5,"funType":["sum","avg","max","min"],"results":[-1, -1, -1, -1]}'''
+
         default_args = ["Data01", payload]
         print(">>>Test: deploy the sharing history storing chaincode"
               "(initial state:{})".format(default_args))
@@ -119,20 +120,18 @@ if __name__ == '__main__':
 
         time.sleep(DEPLOY_WAIT)
 
-    # check if the initial value is correct
-    print(">>>Check the initial value (Data01): ")
-    values = query(chaincode_name, ["Data01"], validate=True)
-    print(values)
-
-    # check query_match_test
+    # check [0.1, sum]
     payload = '''{"budget":0.1, "funType":"sum"}'''
     print(">>>Query test with payload: {}..".format(payload))
     values = query_match_test(chaincode_name, ["Data01", payload], validate=True)
     print(values)
-
     # check the result after query match test
+    time.sleep(TRAN_WAIT)
     print(">>>Check the result: ")
     values = query(chaincode_name, ["Data01"], validate=True)
     print(values)
+
+    # check [0.1, sum]
+
 
     f.close()

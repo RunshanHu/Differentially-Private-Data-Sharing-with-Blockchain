@@ -1,0 +1,111 @@
+swagger: "2.0"
+
+info:
+  version: 1.0.0
+  title: RESTAPI
+  description: A simple API for anonymisation service
+
+schemes:
+  -http
+host: 10.7.6.25:3000
+basePath: /dataset
+
+paths:
+  /all
+    get:
+      summary: Gets all records (for test only)
+      description: Returns a list containing all records
+      responses:
+        200:
+          description: A list of records
+          schema:
+            type: array
+            items: 
+              properties:
+                _id: 
+                  type: string
+                name:
+                  type: string
+                salary:
+                  type: number
+                __v: 
+                  type: version
+
+  /create
+    post:
+      summary: Creates a new record (for administrator only)
+      description: insert a new record into database
+      parameters:
+        -name:   string
+        -salary: number
+  
+  /sum
+    get:
+      summary: Gets the real sum of all salary (for test only)
+      response: 
+        200:
+          description: sum of salary
+          schema:
+            result: number
+    post:
+      summary: Gets the anonymised sum of all salary (for chaincode)
+      parameters:
+        -budget: number
+      responses:
+        200:
+          description: anonymised sum of salary
+            schema: 
+              result: number
+  /avg
+    get:
+      summary: Gets the real average of all salary (for test only)
+      response: 
+        200:
+          description: average of salary
+          schema:
+            result: number
+    post:
+      summary: Gets the anonymised average of all salary (for chaincode)
+      parameters:
+        -budget: number
+      responses:
+        200:
+          description: anonymised average of salary
+            schema: 
+              result: number
+
+  /max
+    get:
+      summary: Gets the real maximum of all salary (for test only)
+      response: 
+        200:
+          description: maximum of salary
+          schema:
+            -result: number
+    post:
+      summary: Gets the anonymised maximum of all salary (for chaincode)
+      parameters:
+        -budget: number
+      responses:
+        200:
+          description: anonymised maximum of salary
+            schema: 
+              result: number
+
+  /min
+    get:
+      summary: Gets the real minimum of all salary (for test only)
+      response: 
+        200:
+          description: minimum of salary
+          schema:
+            result: number
+    post:
+      summary: Gets the anonymised minimum of all salary (for chaincode)
+      parameters:
+        -budget: number
+      responses:
+        200:
+          description: anonymised minimum of salary
+            schema: 
+              -esult:number
