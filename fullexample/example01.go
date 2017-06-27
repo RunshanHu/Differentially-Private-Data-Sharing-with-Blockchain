@@ -242,7 +242,7 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
         
         rawstr := fmt.Sprintf("budget=%f, flag=%d", budget, flag)
         jsonbyte,err = json.Marshal(rawstr)
-        //reader_str := string(jsonstr)
+        reader_str := string(jsonbyte)
         inputbody := bytes.NewBuffer([]byte(jsonbyte));
 
         switch funtype {
