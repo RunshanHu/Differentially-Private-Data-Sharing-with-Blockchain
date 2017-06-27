@@ -15,7 +15,6 @@ import (
         "net/http"
         "net/url"
         "io/ioutil"
-        "strings"
         "bytes"
         "github.com/hyperledger/fabric/core/chaincode/shim"
 )
