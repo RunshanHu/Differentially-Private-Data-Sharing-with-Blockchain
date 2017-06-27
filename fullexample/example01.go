@@ -249,11 +249,11 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
                case "sum": 
                          resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", inputbody)
                case "avg": 
-        //                 resp, err = http.Post("http://10.7.6.25:3000/dataset/avg", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/avg", "application/x-www-form-urlencoded", inputbody) 
                case "max": 
-        //                resp, err = http.Post("http://10.7.6.25:3000/dataset/max", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/max", "application/x-www-form-urlencoded", inputbody)
                case "min": 
-        //                resp, err = http.Post("http://10.7.6.25:3000/dataset/min", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/min", "application/x-www-form-urlencoded", inputbody)
                default:{
                          log.Println("unrecognized function type")
                          normalResp = false; 
