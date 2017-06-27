@@ -240,8 +240,8 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
         normalResp := true;
 
         data := url.Values{};
-        data.Set("budget", "0.5")
-        data.Add("flag", "1");
+        data.Set("budget", strconv.FormatFloat(budget, 'E', -1, 64));
+        data.Add("flag", strconv.Itoa(flag));
         inputbody := bytes.NewBufferString(data.Encode());
 
         switch funtype {
