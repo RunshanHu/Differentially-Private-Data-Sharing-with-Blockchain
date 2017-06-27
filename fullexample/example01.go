@@ -241,7 +241,7 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
         
         rawstr := fmt.Sprintf("budget=%f, flag=%d", budget, flag)
         jsonstr,err = json.Marshal(rawstr)
-        reader_str = string(jsonstr)
+        reader_str := string(jsonstr)
         
         switch funtype {
                case "sum": 
