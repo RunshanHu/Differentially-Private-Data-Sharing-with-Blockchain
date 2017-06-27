@@ -15,6 +15,7 @@ import (
         "net/http"
         "io/ioutil"
         "strings"
+        "bytes"
         "github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
@@ -236,16 +237,17 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
         logger.Info("--->getResultAnonyService called")
         var resp *http.Response
         var err error
-        var jsonstr []byte
+        var jsonbyte []byte
         normalResp := true;
         
         rawstr := fmt.Sprintf("budget=%f, flag=%d", budget, flag)
-        jsonstr,err = json.Marshal(rawstr)
-        reader_str := string(jsonstr)
-        
+        jsonbyte,err = json.Marshal(rawstr)
+        //reader_str := string(jsonstr)
+        inputbody := bytes.NewBuffer([]byte(jsonbyte));
+
         switch funtype {
                case "sum": 
-                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", inputbody)
                case "avg": 
                          resp, err = http.Post("http://10.7.6.25:3000/dataset/avg", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "max": 
