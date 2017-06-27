@@ -234,14 +234,18 @@ type serviceResult struct {
 func getResultAnonyService( funtype string, budget float64, flag int  ) float64  {
 
         logger.Info("--->getResultAnonyService called")
-        normalResp := true;
-        
-        reader_str := fmt.Sprintf("budget='%f', flag='%d'", budget, flag);
         var resp *http.Response
         var err error
+        var jsonstr []byte
+        normalResp := true;
+        
+        rawstr := fmt.Sprintf("budget=%f, flag=%d", budget, flag)
+        jsonstr,err = json.Marshal(rawstr)
+        reader_str = string(jsonstr)
+        
         switch funtype {
                case "sum": 
-                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", &reader_str)
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "avg": 
                          resp, err = http.Post("http://10.7.6.25:3000/dataset/avg", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "max": 
