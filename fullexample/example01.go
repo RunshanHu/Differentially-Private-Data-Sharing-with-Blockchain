@@ -236,7 +236,7 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
         logger.Info("--->getResultAnonyService called")
         normalResp := true;
         
-        reader_str := fmt.Sprintf("budget=%f, flag=%d", budget, flag);
+        reader_str := fmt.Sprintf("budget='%f', flag='%d'", budget, flag);
         var resp *http.Response
         var err error
         switch funtype {
