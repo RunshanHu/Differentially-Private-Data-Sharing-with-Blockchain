@@ -240,14 +240,10 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
         var err error
         var jsonbyte []byte
         normalResp := true;
+
         data := url.Values{};
-        data.Set("budget", budget)
-        data.Add("flag", flag);
-        
-        rawstr := fmt.Sprintf("budget=%f, flag=%d", budget, flag)
-        jsonbyte,err = json.Marshal(rawstr)
-        reader_str := string(jsonbyte)
-        // inputbody := bytes.NewBuffer([]byte(jsonbyte));
+        data.Set("budget", string(budget))
+        data.Add("flag", string(flag));
         inputbody := bytes.NewBufferString(data.Encode());
 
         switch funtype {
