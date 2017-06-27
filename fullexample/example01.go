@@ -136,7 +136,7 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
 
                 old_result = mes_from_ledger.Result[i]
                 // get perturbed result from anonymisation service
-                perturbed_result = getResultAnonyService(mes_from_query.FunType, SMALL_BUDGET)
+                perturbed_result = getResultAnonyService(mes_from_query.FunType, SMALL_BUDGET, 1)
                 // utility test
                 
                 logger.Info("--->got the perturbed result from anonymisation service(using small budget): ", perturbed_result)
@@ -154,7 +154,7 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                         logger.Info("--->perturbed result not pass the utility test! check if satify budget verification")
                         if mes_from_ledger.RemainBudget >= mes_from_query.RequestBudget  {
                               logger.Info("--->Pass the budget verification! Getting the new result from anonymisation service(using requested budget): ")
-                              final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget)
+                              final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget, 0)
                               // updateLedger()
                               updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
 
@@ -174,7 +174,7 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
                 logger.Info("--->Old result not exist! Check if satify budget verification")
                 if mes_from_ledger.RemainBudget >= mes_from_query.RequestBudget  {
                         logger.Info("--->Pass the budget verification! Getting the new result from anonymisation service(using requested, budget): ")
-                        final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget)
+                        final_result = getResultAnonyService(mes_from_query.FunType, mes_from_query.RequestBudget, 0)
                         //updateLedger()
                         updateLedger(stub, dataId, mes_from_query.FunType, final_result, mes_from_query.RequestBudget)
 
@@ -231,12 +231,12 @@ type serviceResult struct {
          Result float64 `json:"result"`
 }
 
-func getResultAnonyService( funtype string, budget float64  ) float64  {
+func getResultAnonyService( funtype string, budget float64, flag int  ) float64  {
 
         logger.Info("--->getResultAnonyService called")
         normalResp := true;
         
-        reader_str := fmt.Sprintf("budget=%f", budget);
+        reader_str := fmt.Sprintf("budget=%f flag=%d", budget, flag);
         var resp *http.Response
         var err error
         switch funtype {
