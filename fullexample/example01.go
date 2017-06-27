@@ -241,7 +241,7 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
         var err error
         switch funtype {
                case "sum": 
-                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", &reader_str)
                case "avg": 
                          resp, err = http.Post("http://10.7.6.25:3000/dataset/avg", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "max": 
