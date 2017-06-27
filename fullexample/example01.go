@@ -13,6 +13,7 @@ import (
         "log"
         "encoding/json"
         "net/http"
+        "net/url"
         "io/ioutil"
         "strings"
         "bytes"
@@ -239,15 +240,19 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
         var err error
         var jsonbyte []byte
         normalResp := true;
+        data := url.Values{};
+        data.Set("budget", budget)
+        data.Add("flag", flag);
         
         rawstr := fmt.Sprintf("budget=%f, flag=%d", budget, flag)
         jsonbyte,err = json.Marshal(rawstr)
         reader_str := string(jsonbyte)
-        inputbody := bytes.NewBuffer([]byte(jsonbyte));
+        // inputbody := bytes.NewBuffer([]byte(jsonbyte));
+        inputbody := bytes.NewBufferString(data.Encode());
 
         switch funtype {
                case "sum": 
-                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/json;charset=utf-8", inputbody)
+                         resp, err = http.Post("http://10.7.6.25:3000/dataset/sum", "application/x-www-form-urlencoded", inputbody)
                case "avg": 
                          resp, err = http.Post("http://10.7.6.25:3000/dataset/avg", "application/x-www-form-urlencoded", strings.NewReader(reader_str))
                case "max": 
