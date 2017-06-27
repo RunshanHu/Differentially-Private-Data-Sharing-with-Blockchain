@@ -237,7 +237,6 @@ func getResultAnonyService( funtype string, budget float64, flag int  ) float64 
         logger.Info("--->getResultAnonyService called")
         var resp *http.Response
         var err error
-        var jsonbyte []byte
         normalResp := true;
 
         data := url.Values{};
