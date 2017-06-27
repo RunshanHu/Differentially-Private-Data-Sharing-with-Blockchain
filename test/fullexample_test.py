@@ -5,6 +5,7 @@ from hyperledger.client import Client
 
 import sys
 import time
+import random
 
 API_URL = 'http://127.0.0.1:7050'
 DEPLOY_WAIT = 20
@@ -100,7 +101,7 @@ if __name__ == '__main__':
 
     # deploy the chaincode
     if not chaincode_name:
-        payload = '''{"budget":0.5,"funType":["sum","avg","max","min"],"results":[-1, -1, -1, -1]}'''
+        payload = '''{"budget":10,"funType":["sum","avg","max","min"],"results":[-1, -1, -1, -1]}'''
 
         default_args = ["Data01", payload]
         print(">>>Test: deploy the sharing history storing chaincode"
@@ -120,18 +121,16 @@ if __name__ == '__main__':
 
         time.sleep(DEPLOY_WAIT)
 
-    # check [0.1, sum]
-    payload = '''{"budget":0.1, "funType":"sum"}'''
-    print(">>>Query test with payload: {}..".format(payload))
-    values = query_match_test(chaincode_name, ["Data01", payload], validate=True)
-    print(values)
-    # check the result after query match test
-    time.sleep(TRAN_WAIT)
-    print(">>>Check the result: ")
-    values = query(chaincode_name, ["Data01"], validate=True)
-    print(values)
+    for i in range(1, 21):
+        funtype = random.choice(['sum', 'avg', 'max', 'min'])
+        payload = '''{"budget":%f, "funType":"%s"}'''%(0.5, funtype)
 
-    # check [0.1, sum]
+        print(">>>Query test with payload: {}..".format(payload))
+        values = query_match_test(chaincode_name, ["Data01", payload], validate=True)
 
-
-    f.close()
+        # check the result after query match test
+        time.sleep(TRAN_WAIT)
+        print(">>>Check the result: ")
+        values = query(chaincode_name, ["Data01"], validate=True)
+        print(values)
+        f.close()

@@ -1,2 +1,2 @@
->>>Test: deploy the sharing history storing chaincode(initial state:['Data01', '{"budget":0.5,"funType":["sum","avg","max","min"],"results":[-1, -1, -1, -1]}'])
-Successfully deploy chaincode with returned name = 04d55170595dc4798dd6e7b66995eec078cb49c678f60c0175a07e5a728c23dc3c9fc46f1395ddc1db85a04202dd8ee642038071d94dd82187e75c0810484f3f
+>>>Test: deploy the sharing history storing chaincode(initial state:['Data01', '{"budget":10,"funType":["sum","avg","max","min"],"results":[-1, -1, -1, -1]}'])
+Successfully deploy chaincode with returned name = 1587f68e726ec25ddb7b622dc885b9fdcb7de0596ce45b290765140f5062e1af4128b2b4384b170398f5f8f46b882fd31e8b34055a71a1b2e18cdd2b22d28d74
