@@ -4,20 +4,26 @@ var mongoose = require('mongoose'),
   Data = mongoose.model('Data');
 
 const UTILITY_BOUND = 1500;
+const SMALL_BUDGET = 0.05;
+const SENSI = 1;
 
-function Lap(mu, b, min, max) {
-  var x = Math.random() * (max - min) + min;
-  var f = 0.5 / b * Math.exp( -Math.abs(x-mu) / b);
+function Lap(mu, b) {
+  var x = Math.random() - 0.5;
+  var f;
+  if (x > 0) {
+      f = mu - b * Math.log(1 - 2*x);
+  } else {
+      f = mu + b * Math.log(1 + 2*x);
+  }
   return f;
 }
 
 function generateNoise(budget, global_sensitivity, utility_bound) {
-  var min = -10;
-  var max = 10;
-  var noise = Lap(0, budget*global_sensitivity, min, max);
-  while (noise > utility_bound) {
-      noise = Lap(0, budget*global_sensitivity, min, max);
+  var noise = Lap(0, global_sensitivity / budget);
+  while (Math.abs(noise) > utility_bound) {
+      noise = Lap(0, global_sensitivity / budget);
   }
+  console.log("---> generating noise, budget: ", budget, " global_sensitivity: ", global_sensitivity);
   console.log("---> generated noise: ", noise );
   return noise;
 }
@@ -60,16 +66,6 @@ exports.getsum = function(req, res) {
   });
 }
 
-exports.get_noise_sum = function(req, res) {
-  console.log('---> get noise sum')
-  Data.find({}, function(err, records){
-    var global_sensitivity = calculate_max(records);
-    var sum = calculate_sum(records) + generateNoise(req.body.budget, global_sensitivity, UTILITY_BOUND); 
-    res.json({"Result": sum});
-  });
-  
-}
-
 exports.getavg = function(req, res) {
   console.log('---> get real avg ');
   Data.find({}, function(err, records){
@@ -78,28 +74,10 @@ exports.getavg = function(req, res) {
   });
 }
 
-exports.get_noise_avg = function(req, res) {
-  console.log('---> get noise avg ')
-  Data.find({}, function(err, records){
-    var global_sensitivity = calculate_max(records) / (records.length - 1);
-    var avg = calculate_avg(records) + generateNoise(req.body.budget, global_sensitivity, UTILITY_BOUND);
-    res.json({"Result": avg});
-  });
-}
-
-
 exports.getmax = function(req, res) {
   console.log('--> get real max ');
   Data.find({}, function(err, records){
     var max = calculate_max(records);
-    res.json({"Result": max});
-  });
-}
-exports.get_noise_max = function(req, res) {
-  console.log('---> get noise max ');
-  Data.find({}, function(err, records){
-    var global_sensitivity = calculate_max(records);
-    var max = calculate_max(records) + generateNoise(req.body.budget, global_sensitivity, UTILITY_BOUND);
     res.json({"Result": max});
   });
 }
@@ -112,11 +90,70 @@ exports.getmin = function(req, res) {
   });
 }
 
+exports.get_noise_sum = function(req, res) {
+  console.log('---> get noise sum')
+  Data.find({}, function(err, records){
+    var global_sensitivity, budget;
+    console.log("---> received request body: ", req.body);
+    if(req.body.flag == 1) {
+        global_sensitivity = SENSI;
+        budget = SMALL_BUDGET;
+    } else {
+        global_sensitivity = calculate_max(records);
+        budget = req.body.budget;
+    }
+    var sum = calculate_sum(records) + generateNoise(budget, global_sensitivity, UTILITY_BOUND); 
+    res.json({"Result": sum});
+  });
+}
+
+exports.get_noise_avg = function(req, res) {
+  console.log('---> get noise avg ')
+  Data.find({}, function(err, records){
+    var global_sensitivity, budget;
+    console.log("---> received request body: ", req.body);
+    if(req.body.flag == 1) {
+        global_sensitivity = SENSI;
+        budget = SMALL_BUDGET;
+    } else {
+        global_sensitivity = calculate_max(records) / records.length;
+        budget = req.body.budget;
+    }
+    var avg = calculate_avg(records) + generateNoise(budget, global_sensitivity, UTILITY_BOUND);
+    res.json({"Result": avg});
+  });
+}
+
+exports.get_noise_max = function(req, res) {
+  console.log('---> get noise max ');
+  Data.find({}, function(err, records){
+    var global_sensitivity, budget;
+    console.log("---> received request body: ", req.body);
+    if(req.body.flag == 1) {
+        global_sensitivity = SENSI;
+        budget = SMALL_BUDGET;
+    } else {
+        global_sensitivity = calculate_max(records);
+        budget = req.body.budget;
+    }
+    var max = calculate_max(records) + generateNoise(budget, global_sensitivity, UTILITY_BOUND);
+    res.json({"Result": max});
+  });
+}
+
 exports.get_noise_min = function(req, res) {
   console.log('---> get noise min ')
   Data.find({}, function(err, records){
-    var global_sensitivity = calculate_min(records);
-    var min = calculate_min(records) + generateNoise(req.body.budget, global_sensitivity, UTILITY_BOUND);
+    var global_sensitivity, budget;
+    console.log("---> received request body: ", req.body);
+    if(req.body.flag == 1) {
+        global_sensitivity = SENSI;
+        budget = SMALL_BUDGET;
+    } else {
+        global_sensitivity = calculate_min(records);
+        budget = req.body.budget;
+    }
+    var min = calculate_min(records) + generateNoise(budget, global_sensitivity, UTILITY_BOUND);
     res.json({"Result": min});
   });
 }

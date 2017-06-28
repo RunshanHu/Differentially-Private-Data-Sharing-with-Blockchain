@@ -20,8 +20,8 @@ import (
         "github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
-const SMALL_BUDGET = 0.5
-const UTILITY_BOUND = 5
+const SMALL_BUDGET = 0.05
+const UTILITY_BOUND = 1500
 
 type SimpleChaincode struct {
 }
@@ -83,7 +83,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 
 func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
        
-       var str  string
+       var str string
 
        logger.Info("--->queryMatchTest called!")
 
@@ -122,7 +122,7 @@ func (t *SimpleChaincode) queryMatchTest(stub shim.ChaincodeStubInterface, args 
        var old_result, final_result, perturbed_result float64
        var i int
        var e string
-       SMALL_BUDGET := 0.1;
+       
        for i, e = range mes_from_ledger.FunType {
                 if e == mes_from_query.FunType {
                         if mes_from_ledger.Result[i] > 0 {
