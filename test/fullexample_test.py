@@ -128,13 +128,12 @@ if __name__ == '__main__':
         print(">>>Query test with payload: {}..".format(payload))
         values = query_match_test(chaincode_name, ["Data01", payload], validate=True)
 
-        f.write(">>>%d th query with payload: %s"%(i, payload))
+        f.write(">>>%d th query with payload: %s\n"%(i, payload))
 
         # check the result after query match test
         time.sleep(TRAN_WAIT)
-        print(">>>Check the result: ")
         values = query(chaincode_name, ["Data01"], validate=True)
         print(values)
-        f.write(">>>> The value: %s"%(values))
+        f.write(">>>> The value: %s\n"%(values))
 
     f.close()
