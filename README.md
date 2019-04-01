@@ -1,5 +1,4 @@
-# sharing-history-storing chaincode
+# Hyperledger Chaincode for Differentially Private Data Sharing with Blockchain
 
-example: the go chaincode
-
-test: python test file and result.
+dummy implementation for papaper _Differentially Private Data
+Sharing in Cloud Federation with Blockchain_
